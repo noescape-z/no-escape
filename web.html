@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="zh-CN" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cavez服务器 - 公告</title>
+    <style>
+        /* ===== CSS 变量 ===== */
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-sidebar: rgba(255, 255, 255, 0.75);
+            --border-sidebar: rgba(255, 255, 255, 0.3);
+            --shadow-sidebar: 4px 0 30px rgba(0, 0, 0, 0.05);
+            --text-primary: #1a1a2e;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
+            --text-light: #9ca3af;
+            --bg-card: #ffffff;
+            --border-card: rgba(0, 0, 0, 0.04);
+            --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
+            --bg-hover: rgba(99, 102, 241, 0.08);
+            --bg-active: rgba(99, 102, 241, 0.12);
+            --bg-social: rgba(0, 0, 0, 0.04);
+            --bg-hamburger: rgba(255, 255, 255, 0.9);
+            --border-hamburger: rgba(0, 0, 0, 0.08);
+            --overlay-bg: rgba(0, 0, 0, 0.3);
+            --scrollbar-thumb: rgba(99, 102, 241, 0.3);
+            --scrollbar-thumb-hover: rgba(99, 102, 241, 0.5);
+            --gradient-start: #6366f1;
+            --gradient-end: #a855f7;
+            --notice-bg: rgba(255, 200, 50, 0.08);
+            --notice-border: rgba(255, 200, 50, 0.3);
+            --notice-icon: #f59e0b;
+            --mc-green: #55ff55;
+            --mc-darkgreen: #2a7a2a;
+            --mc-gold: #ffaa00;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f0f1a;
+            --bg-sidebar: rgba(25, 25, 45, 0.85);
+            --border-sidebar: rgba(255, 255, 255, 0.06);
+            --shadow-sidebar: 4px 0 30px rgba(0, 0, 0, 0.4);
+            --text-primary: #e8e8f0;
+            --text-secondary: #a8a8b8;
+            --text-muted: #8888a0;
+            --text-light: #666680;
+            --bg-card: rgba(30, 30, 55, 0.6);
+            --border-card: rgba(255, 255, 255, 0.06);
+            --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.2);
+            --bg-hover: rgba(99, 102, 241, 0.15);
+            --bg-active: rgba(99, 102, 241, 0.2);
+            --bg-social: rgba(255, 255, 255, 0.06);
+            --bg-hamburger: rgba(25, 25, 45, 0.9);
+            --border-hamburger: rgba(255, 255, 255, 0.08);
+            --overlay-bg: rgba(0, 0, 0, 0.6);
+            --scrollbar-thumb: rgba(99, 102, 241, 0.3);
+            --scrollbar-thumb-hover: rgba(99, 102, 241, 0.5);
+            --notice-bg: rgba(255, 200, 50, 0.06);
+            --notice-border: rgba(255, 200, 50, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-body);
+            display: flex;
+            min-height: 100vh;
+            transition: background 0.4s ease, color 0.3s ease;
+        }
+
+        /* ===== 侧边栏 ===== */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background: var(--bg-sidebar);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-sidebar);
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease, border-color 0.4s ease;
+            box-shadow: var(--shadow-sidebar);
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--mc-green), var(--mc-darkgreen));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(85, 255, 85, 0.25);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-avatar:hover {
+            transform: scale(1.05) rotate(-5deg);
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-hover);
+            color: var(--gradient-start);
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: var(--bg-active);
+            color: var(--gradient-start);
+            font-weight: 600;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--mc-green), var(--mc-darkgreen));
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: linear-gradient(135deg, var(--mc-green), var(--mc-darkgreen));
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid rgba(128, 128, 128, 0.1);
+        }
+
+        .sidebar-footer .social-links {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .sidebar-footer .social-links a {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--bg-social);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.25s ease;
+        }
+
+        .sidebar-footer .social-links a:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--gradient-start);
+            transform: translateY(-2px);
+        }
+
+        .sidebar-footer .copyright {
+            font-size: 12px;
+            color: var(--text-light);
+            transition: color 0.3s ease;
+        }
+
+        /* ===== 主内容 ===== */
+        .main-content {
+            flex: 1;
+            padding: 48px 56px;
+            max-width: 900px;
+            margin: 0 auto;
+            transition: color 0.3s ease;
+        }
+
+        .main-content h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .main-content .page-subtitle {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 32px;
+            transition: color 0.3s ease;
+        }
+
+        /* ===== 公告卡片 ===== */
+        .notice-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-card);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notice-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        [data-theme="dark"] .notice-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .notice-card .notice-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .notice-card .notice-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .notice-card .notice-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .notice-card .notice-tag {
+            margin-left: auto;
+            font-size: 12px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            background: var(--notice-bg);
+            border: 1px solid var(--notice-border);
+            color: var(--notice-icon);
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .notice-card .notice-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            transition: color 0.3s ease;
+        }
+
+        .notice-card .notice-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .notice-card .notice-content {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .notice-card .notice-content p {
+            margin-bottom: 8px;
+        }
+
+        .notice-card .notice-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .notice-card .notice-content code {
+            background: var(--bg-hover);
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: var(--gradient-start);
+        }
+
+        /* ===== IP 地址高亮 ===== */
+        .mc-ip {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(85, 255, 85, 0.15), rgba(42, 122, 42, 0.15));
+            border: 1px solid rgba(85, 255, 85, 0.3);
+            padding: 4px 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--mc-green);
+            letter-spacing: 0.5px;
+            margin: 6px 0;
+        }
+
+        [data-theme="dark"] .mc-ip {
+            color: #66ff66;
+            background: linear-gradient(135deg, rgba(85, 255, 85, 0.08), rgba(42, 122, 42, 0.08));
+        }
+
+        .mc-server-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(85, 255, 85, 0.12);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--mc-green);
+            font-weight: 500;
+        }
+
+        .mc-server-status .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--mc-green);
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        .notice-card.pinned {
+            border-left: 4px solid var(--mc-green);
+            background: var(--bg-active);
+        }
+
+        /* ===== 主题切换 ===== */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-card);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--gradient-start);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+        }
+
+        .theme-toggle .toggle-icon {
+            font-size: 20px;
+            transition: transform 0.5s ease;
+        }
+
+        .theme-toggle:hover .toggle-icon {
+            transform: rotate(30deg);
+        }
+
+        /* ===== 汉堡菜单 ===== */
+        .hamburger {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            background: var(--bg-hamburger);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-hamburger);
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        .hamburger:hover {
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--overlay-bg);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+            transition: background 0.3s ease;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                transform: translateX(-100%);
+                width: 300px;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: 4px 0 40px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .overlay.show {
+                display: block;
+            }
+
+            .main-content {
+                padding: 80px 20px 40px;
+            }
+
+            .main-content h1 {
+                font-size: 28px;
+            }
+
+            .theme-toggle {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
+
+            .notice-card {
+                padding: 20px;
+            }
+
+            .notice-card .notice-tag {
+                margin-left: 0;
+            }
+
+            .mc-ip {
+                font-size: 15px;
+                padding: 3px 12px;
+                word-break: break-all;
+            }
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="切换菜单">☰</button>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ===== 侧边栏 ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-avatar">⛏️</div>
+        <div class="sidebar-title">cavez 服务器</div>
+        <div class="sidebar-subtitle">🎮 MC 服务器公告</div>
+
+        <button class="theme-toggle" id="themeToggle">
+            <span class="toggle-icon" id="toggleIcon">🌙</span>
+            <span id="toggleText">切换到深色模式</span>
+        </button>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <span class="nav-icon">📢</span>
+                    公告
+                    <span class="nav-badge">3</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">📖</span>
+                    文章
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">🏷️</span>
+                    分类
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">🔖</span>
+                    标签
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">💬</span>
+                    留言板
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">❓</span>
+                    关于
+                </a>
+            </li>
+        </ul>
+
+        <!-- ===== 底部 ===== -->
+        <div class="sidebar-footer">
+            <div class="social-links">
+                <a href="#" title="GitHub">🐙</a>
+                <a href="#" title="Twitter">🐦</a>
+                <a href="#" title="RSS">📡</a>
+                <a href="#" title="邮箱">✉️</a>
+            </div>
+            <div class="copyright">© 2026 cavez服务器小站 · ⛏️ 版本 1.21.11</div>
+        </div>
+    </aside>
+
+    <!-- ===== 主内容 ===== -->
+    <main class="main-content">
+        <h1>📢 服务器公告</h1>
+        <div class="page-subtitle">🎮 在这里发布 Minecraft 服务器的最新动态</div>
+
+        <!-- ===== 公告 1：开服公告（置顶） ===== -->
+        <div class="notice-card pinned">
+            <div class="notice-header">
+                <span class="notice-icon">🎉</span>
+                <span class="notice-title">MC 服务器正式开服！</span>
+                <span class="notice-tag">🔥 置顶</span>
+            </div>
+            <div class="notice-meta">
+                <span>📅 2026-07-18</span>
+                <span>👤 腐竹</span>
+                <span>📂 开服公告</span>
+                <span class="mc-server-status">
+                    <span class="dot"></span> 服务器在线
+                </span>
+            </div>
+            <div class="notice-content">
+                <p>🎮 经过一段时间的筹备，我的 <strong>Minecraft 服务器</strong> 终于正式开服啦！</p>
+                <p>📌 服务器地址：</p>
+                <p><span class="mc-ip">cavez.映射.中国</span></p>
+                <p>📋 当前版本：<strong>1.21.11</strong> · 纯净生存服 · 正版验证</p>
+                <p>👥 欢迎各位小伙伴前来玩耍！一起建家、下矿、打龙！</p>
+                <p style="margin-top: 10px; color: var(--mc-gold);">✨ 开服福利：新玩家送一套铁装备 + 食物大礼包！</p>
+            </div>
+        </div>
+
+        <!-- ===== 公告 2：插件更新 ===== -->
+        <div class="notice-card">
+            <div class="notice-header">
+                <span class="notice-icon">🛠️</span>
+                <span class="notice-title">服务器插件更新</span>
+                <span class="notice-tag">更新</span>
+            </div>
+            <div class="notice-meta">
+                <span>📅 2026-07-17</span>
+                <span>👤 腐竹</span>
+                <span>📂 技术更新</span>
+            </div>
+            <div class="notice-content">
+                <p>🔧 新增以下插件：</p>
+                <p>• <strong>PlayerTitle</strong> — 玩家称号系统，解锁各种炫酷头衔！<br>
+                &nbsp;&nbsp;👑 示例：<code>『萌新』</code> <code>『建筑大师』</code> <code>『挖矿达人』</code></p>
+                <p>• <strong>领地插件</strong> — 圈地保护，让你的建筑不被破坏<br>
+                &nbsp;&nbsp;🔧 指令：<code>/res create 领地名称</code> 创建领地</p>
+                <p>📌 输入 <code>/help</code> 查看所有可用指令。</p>
+            </div>
+        </div>
+
+        <!-- ===== 公告 3：招募 ===== -->
+        <div class="notice-card">
+            <div class="notice-header">
+                <span class="notice-icon">👑</span>
+                <span class="notice-title">招募管理员 & 建筑师</span>
+                <span class="notice-tag">招募</span>
+            </div>
+            <div class="notice-meta">
+                <span>📅 2026-07-16</span>
+                <span>👤 腐竹</span>
+                <span>📂 人员招募</span>
+            </div>
+            <div class="notice-content">
+                <p>🏗️ 服务器现面向全体玩家招募：</p>
+                <p>• <strong>管理员 2 名</strong> — 负责日常维护、玩家管理<br>
+                • <strong>建筑师 3 名</strong> — 负责主城及公共设施建设</p>
+                <p>📩 有兴趣的小伙伴请在公告下方留言或私信腐竹！</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== JavaScript ===== -->
+    <script>
+        // ===== 主题切换 =====
+        const htmlRoot = document.getElementById('htmlRoot');
+        const themeToggle = document.getElementById('themeToggle');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const toggleText = document.getElementById('toggleText');
+
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function getCurrentTheme() {
+            return localStorage.getItem('blog-theme') || 'light';
+        }
+
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                htmlRoot.setAttribute('data-theme', 'dark');
+                toggleIcon.textContent = '☀️';
+                toggleText.textContent = '切换到浅色模式';
+                localStorage.setItem('blog-theme', 'dark');
+            } else {
+                htmlRoot.removeAttribute('data-theme');
+                toggleIcon.textContent = '🌙';
+                toggleText.textContent = '切换到深色模式';
+                localStorage.setItem('blog-theme', 'light');
+            }
+        }
+
+        function toggleTheme() {
+            const current = getCurrentTheme();
+            setTheme(current === 'light' ? 'dark' : 'light');
+        }
+
+        const savedTheme = localStorage.getItem('blog-theme');
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            setTheme(getSystemTheme());
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('blog-theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // ===== 侧边栏 =====
+        const sidebar = document.getElementById('sidebar');
+        const hamburger = document.getElementById('hamburgerBtn');
+        const overlay = document.getElementById('overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        hamburger.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+
+</body>
+</html>
